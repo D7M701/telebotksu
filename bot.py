@@ -4,7 +4,7 @@ import telebot
 from flask import Flask
 from datetime import datetime
 
-TOKEN = '8787056666:AAFRmwg1xGmViHvSYJyMooLNRPQV-mLjBEU'
+TOKEN = '8787056666:AAFRnwg1xGmVihvSYJyWooLNRPQV-mLj8EU'
 bot = telebot.TeleBot(TOKEN)
 
 # حط هنا معرف القناة أو القروب الإجباري (مثلاً '@ChannelName' أو '-100xxxxxxxxxx')
