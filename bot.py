@@ -4,7 +4,7 @@ import telebot
 from flask import Flask
 from datetime import datetime
 
-TOKEN = '8787056666:AAFrnwglxGmViHvSYJyWooLNRPQV-mLj8EU'
+TOKEN = '8787056666:AAFRnwg1xGmVihvSYJyWooLNRPQV-mLj8EU'
 bot = telebot.TeleBot(TOKEN)
 
 # حط رقم الآيدي الخاص بك هنا (مثلاً: 123456789)
