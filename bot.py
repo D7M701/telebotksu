@@ -3,7 +3,7 @@ import telebot
 from flask import Flask
 
 # رمز بوت تيليجرام حقك
-TOKEN = '7629571936:AAHzjC-T2d8J0z8L3t_XXXXXXX'  # حط التوكن حقك هنا إذا لم يكن محفوظاً في مكان آخر
+TOKEN = '8787056666:AAFRnwg1xGmVihvSYJyWooLNRPQV-mLj8EU'  # حط التوكن حقك هنا إذا لم يكن محفوظاً في مكان آخر
 bot = telebot.TeleBot(TOKEN)
 
 
