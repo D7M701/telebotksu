@@ -1,9 +1,9 @@
 import os
+import threading
 import telebot
 from flask import Flask
 
-# رمز بوت تيليجرام حقك
-TOKEN = '8787056666:AAFRnwg1xGmVihvSYJyWooLNRPQV-mLj8EU'  # حط التوكن حقك هنا إذا لم يكن محفوظاً في مكان آخر
+TOKEN = '8787056666:AAFRmwg1xGmViHvSYJyMooLNRPQV-mLjBEU'
 bot = telebot.TeleBot(TOKEN)
 
 
@@ -21,16 +21,15 @@ def home():
   return 'I am alive!'
 
 
+def run_bot():
+  bot.infinity_polling()
+
+
 if __name__ == '__main__':
-  # تشغيل بوت تيليجرام بخلفية بسيطة أو تشغيل السيرفر
-  import threading
-
-  def run_bot():
-    bot.infinity_polling()
-
+  # تشغيل البوت في مسار جانبي (Thread)
   t = threading.Thread(target=run_bot)
   t.start()
 
-  # تشغيل سيرفر الويب على البورت المطلوب
+  # تشغيل السيرفر على البورت المطلوب
   port = int(os.environ.get('PORT', 10000))
   app.run(host='0.0.0.0', port=port)
