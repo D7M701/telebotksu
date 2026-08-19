@@ -4,20 +4,21 @@ import telebot
 from flask import Flask
 from datetime import datetime
 
-TOKEN = '8787056666:AAFRnwg1xGmVihvSYJyWooLNRPQV-mLj8EU'
+TOKEN = '8787056666:AAFrnwglxGmViHvSYJyWooLNRPQV-mLj8EU'
 bot = telebot.TeleBot(TOKEN)
 
-# حط هنا معرف القناة أو القروب الإجباري (مثلاً '@ChannelName' أو '-100xxxxxxxxxx')
+# حط رقم الآيدي الخاص بك هنا (مثلاً: 123456789)
+ADMIN_CHAT_ID = 1085878578  
+
 REQUIRED_CHAT = '@telebotksu'
 
 months_ar = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", 
              "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
 
-# دالة للتحقق مما إذا كان المستخدم عضو في القناة/القروب
+# دالة للتحقق مما إذا كان المستخدم عضواً في القناة/القروب
 def check_membership(user_id):
     try:
         member = bot.get_chat_member(REQUIRED_CHAT, user_id)
-        # إذا كانت حالة المستخدم من ضمن المسموح لهم
         if member.status in ['creator', 'administrator', 'member']:
             return True
     except Exception as e:
@@ -30,37 +31,50 @@ def send_welcome(message):
     
     # تحقق من الاشتراك
     if not check_membership(user_id):
-        bot.reply_to(message, f"عذراً, يجب عليك الانضمام إلى القناة/القروب أولاً لكي يعمل معك البوت:\n{REQUIRED_CHAT}\n\nبعد الانضمام، ارسل /start مجدداً.")
+        bot.reply_to(message, f"عذراً، يجب عليك الاشتراك في القناة أولاً: {REQUIRED_CHAT}")
         return
 
-    # إذا اشترك، تطلع له رسالة الترحيب أو المكافأة مباشرة
-    now = datetime.now()
-    target_date = datetime(now.year, now.month, 27)
-    if now.day > 27:
-        if now.month == 12:
-            target_date = datetime(now.year + 1, 1, 27)
-        else:
-            target_date = datetime(now.year, now.month + 1, 27)
-            
-    delta = target_date - now
-    days_left = delta.days
-    month_name = months_ar[target_date.month - 1]
-    
-    msg = (f"أهلاً بك! 🚀\n\n"
-           f"مُتوقع إيداع مكافأة شهر {month_name} يوم\n"
-           f"الموافق [2026-{target_date.month:02d}-27م] [بعد {days_left + 1} أيّام ]")
-    bot.reply_to(message, msg)
+    bot.reply_to(message, "أهلاً بك في بوت مؤقت المكافأة!")
 
-app = Flask('')
+# دالة استقبال وتحويل أي رسالة نصية أخرى لك
+@bot.message_handler(func=lambda message: True)
+def forward_to_admin(message):
+    # تجاهل رسائل الآدمن نفسه عشان ما يصير تكرار
+    if message.from_user.id == ADMIN_CHAT_ID:
+        return
+        
+    user = message.from_user
+    text = message.text or "[محتوى ليس نصاً]"
+    
+    log_text = (
+        f"📩 رسالة جديدة من مستخدم:\n\n"
+        f"👤 الاسم: {user.first_name} {user.last_name or ''}\n"
+        f"🔗 اليوزر: @{user.username or 'لا يوجد'}\n"
+        f"🆔 الآيدي: `{user.id}`\n\n"
+        f"💬 الرسالة:\n{text}"
+    )
+    
+    try:
+        bot.send_message(ADMIN_CHAT_ID, log_text, parse_mode="Markdown")
+    except Exception as e:
+        print(f"Error forwarding to admin: {e}")
+
+# إعداد خادم Flask بسيط للبقاء نشطاً على Render
+app = Flask(__name__)
+
 @app.route('/')
 def home():
-    return 'I am alive!'
+    return "Bot is running!"
 
-def run_bot():
-    bot.infinity_polling()
+def run_flask():
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
 if __name__ == '__main__':
-    t = threading.Thread(target=run_bot)
+    # تشغيل سيرفر Flask في خيط مستقل
+    t = threading.Thread(target=run_flask)
+    t.daemon = True
     t.start()
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port)
+    
+    # تشغيل البوت
+    print("Bot is polling...")
+    bot.infinity_polling()
